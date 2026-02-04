@@ -1,10 +1,15 @@
 const axios = require('axios');
 const delay = require('../utils/delay');
 
-// Load environment variables
-const USER_AGENT = process.env.USER_AGENT;
-const REQUEST_DELAY_MS = parseInt(process.env.REQUEST_DELAY_MS, 10);
-const MAX_IMAGE_COUNT = parseInt(process.env.MAX_IMAGE_COUNT, 10);
+// Load environment variables with sensible defaults
+const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36';
+const USER_AGENT = process.env.USER_AGENT || DEFAULT_USER_AGENT;
+const REQUEST_DELAY_MS = Number.isFinite(parseInt(process.env.REQUEST_DELAY_MS, 10))
+  ? parseInt(process.env.REQUEST_DELAY_MS, 10)
+  : 500;
+const MAX_IMAGE_COUNT = Number.isFinite(parseInt(process.env.MAX_IMAGE_COUNT, 10))
+  ? parseInt(process.env.MAX_IMAGE_COUNT, 10)
+  : 200;
 
 const vqdCache = new Map();
 const VQD_CACHE_TTL_MS = 10 * 60 * 1000; // Cache tokens for 10 minutes
@@ -77,7 +82,7 @@ const scrapeImages = async (query, count, safeSearch, offset) => {
   try {
     vqd = await getVqdToken(query);
   } catch (error) {
-    throw { status: 502, message: error.message };
+    throw { status: 502, message: error.message, details: 'Failed to retrieve vqd token.' };
   }
   
   const results = [];
@@ -126,14 +131,31 @@ const scrapeImages = async (query, count, safeSearch, offset) => {
       }
     } catch (error) {
         if (error.response) {
-            console.error(`DDG API request failed with status: ${error.response.status}`);
-            if (error.response.status === 429) {
-                throw { status: 429, message: 'Rate limited by DuckDuckGo.' };
+            const upstreamStatus = error.response.status;
+            const retryAfter = error.response.headers?.['retry-after'];
+            console.error(`DDG API request failed with status: ${upstreamStatus}`);
+            if (upstreamStatus === 429) {
+                throw {
+                    status: 429,
+                    message: 'Rate limited by DuckDuckGo.',
+                    details: 'Upstream responded with HTTP 429.',
+                    retryAfter: retryAfter,
+                };
             }
-        } else {
-            console.error('Error fetching image results:', error.message);
+
+            throw {
+                status: 502,
+                message: 'Failed to fetch results from DuckDuckGo.',
+                details: `Upstream responded with HTTP ${upstreamStatus}.`,
+            };
         }
-        throw { status: 502, message: 'Failed to fetch results from DuckDuckGo.' };
+
+        console.error('Error fetching image results:', error.message);
+        throw {
+            status: 502,
+            message: 'Failed to fetch results from DuckDuckGo.',
+            details: error.message,
+        };
     }
   }
 

@@ -10,25 +10,42 @@ router.get('/images', async (req, res) => {
   const { q, count, safe, offset } = req.query;
 
   // 1. Validate 'q' parameter
-  if (!q) {
+  if (typeof q !== 'string' || q.trim().length === 0) {
     return res.status(400).json({ error: 'The "q" parameter (search query) is required.' });
   }
 
   // 2. Validate and parse 'count' parameter
-  let numImages = parseInt(count, 10) || 30;
+  let numImages = 30;
+  if (count !== undefined) {
+    const parsedCount = Number.parseInt(count, 10);
+    if (!Number.isInteger(parsedCount) || parsedCount <= 0) {
+      return res.status(400).json({ error: 'The "count" parameter must be a positive integer.' });
+    }
+    numImages = parsedCount;
+  }
   if (numImages > MAX_IMAGE_COUNT) {
     numImages = MAX_IMAGE_COUNT;
   }
 
   // 3. Validate and parse 'safe' parameter
-  const safeSearch = parseInt(safe, 10);
   const validSafeModes = [1, 0, -1];
-  const safeSearchMode = validSafeModes.includes(safeSearch) ? safeSearch : 1;
+  let safeSearchMode = 1;
+  if (safe !== undefined) {
+    const safeSearch = Number.parseInt(safe, 10);
+    if (!Number.isInteger(safeSearch) || !validSafeModes.includes(safeSearch)) {
+      return res.status(400).json({ error: 'The "safe" parameter must be one of: 1, 0, -1.' });
+    }
+    safeSearchMode = safeSearch;
+  }
 
   // 4. Validate and parse 'offset' parameter
-  let numOffset = parseInt(offset, 10) || 0;
-  if (numOffset < 0) {
-    numOffset = 0; // Offset cannot be negative
+  let numOffset = 0;
+  if (offset !== undefined) {
+    const parsedOffset = Number.parseInt(offset, 10);
+    if (!Number.isInteger(parsedOffset) || parsedOffset < 0) {
+      return res.status(400).json({ error: 'The "offset" parameter must be a non-negative integer.' });
+    }
+    numOffset = parsedOffset;
   }
 
   try {
@@ -45,7 +62,14 @@ router.get('/images', async (req, res) => {
   } catch (err) {
     const statusCode = err.status || 500;
     const message = err.message || 'An internal server error occurred.';
-    res.status(statusCode).json({ error: message });
+    const responseBody = { error: message };
+    if (err.details) {
+      responseBody.details = err.details;
+    }
+    if (err.retryAfter) {
+      responseBody.retryAfter = err.retryAfter;
+    }
+    res.status(statusCode).json(responseBody);
   }
 });
 
