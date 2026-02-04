@@ -2,7 +2,7 @@
 
 A powerful and efficient Node.js REST API for scraping image search results from DuckDuckGo.
 
-# #Overview
+## Overview
 
 This project provides a simple yet robust REST API built with Express.js that fetches image results from DuckDuckGo. It's designed to be a reliable backend service for applications that need dynamic image content without requiring an official API key.
 
@@ -88,7 +88,7 @@ Example Requests
 
 You can use cURL or any other HTTP client to interact with the API.
 
-###1. Basic Request
+### 1. Basic Request
 Fetch the default 30 images for the query "forests".
 
 
@@ -96,21 +96,21 @@ Fetch the default 30 images for the query "forests".
 curl "http://localhost:3000/images?q=forests"
 ```
 
-###2. Custom Count & Safe Search
+### 2. Custom Count & Safe Search
 Fetch 15 images of "supernova" with safe search turned off.
 
 ```
 curl "http://localhost:3000/images?q=supernova&count=15&safe=-1"
 ```
 
-###3. Pagination with Offset
+### 3. Pagination with Offset
 Fetch the "second page" of results for "classic cars" by skipping the first 25.
 
 ```
 curl "http://localhost:3000/images?q=classic+cars&count=25&offset=25"
 ```
 
-###4. Invalid Request (Missing q parameter)
+### 4. Invalid Request (Missing q parameter)
 
 
 This will return a 400 Bad Request with an error message:
@@ -120,7 +120,7 @@ This will return a 400 Bad Request with an error message:
   "error": "The \"q\" parameter (search query) is required."
 }```
 
-###Example Success Response
+Example Success Response:
 
 A  successful request returns a JSON object with metadata and a results array.
 
@@ -147,20 +147,20 @@ A  successful request returns a JSON object with metadata and a results array.
 }
 ```
 
-#Local Development Setup
+# Local Development Setup
 
 Follow these steps to run the API on your own machine.
 
-##1. Clone the Repository
+## 1. Clone the Repository
 
  https://github.com/Dreamyboyyt/ddg-image-scraper.git
 cd ddg-image-scraper
 
-##2. Install Dependencies
+## 2. Install Dependencies
 You'll need Node.js and npm installed.
 
 
-##3. Create Environment File
+## 3. Create Environment File
 Create a .env file in the project root. This file stores configuration that should not be committed to Git. Copy and paste the following, adjusting if needed.
 
 
@@ -182,17 +182,17 @@ MAX_IMAGE_COUNT=200 (per query)
 
 The API is now live and listening at http://localhost:3000.
 
-#Deployment Guide for Vercel
+# Deployment Guide for Vercel
 
 This project is optimized for a quick and free deployment on Vercel.
 
-##1. Prerequisites
+## 1. Prerequisites
 
 A GitHub account with your project code pushed to a repository.
 
 A Vercel account (you can sign up for free with your GitHub account).
 
-##2. Import Your Project in Vercel
+## 2. Import Your Project in Vercel
 
 Log in to your Vercel dashboard.
 
@@ -200,7 +200,7 @@ Click "Add New... -> Project".
 
 Select the GitHub repository for this project. Vercel will automatically detect that it's a Node.js application.
 
-##3. Configure the Project
+## 3. Configure the Project
 
 The build settings should be automatically configured thanks to the vercel.json file. You don't need to change them.
 
@@ -213,7 +213,7 @@ MAX_IMAGE_COUNT 200
 REQUEST_DELAY_MS	500
 USER_AGENT Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
 
-4. Deploy
+## 4. Deploy
 
 Click the "Deploy" button.
 
