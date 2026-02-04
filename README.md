@@ -145,7 +145,6 @@ A  successful request returns a JSON object with metadata and a results array.
     }
   ]
 }
-```
 
 # Local Development Setup
 
@@ -153,8 +152,10 @@ Follow these steps to run the API on your own machine.
 
 ## 1. Clone the Repository
 
- https://github.com/Dreamyboyyt/ddg-image-scraper.git
+```
+git clone https://github.com/imsleepy69x/ddg-image-scraper.git
 cd ddg-image-scraper
+```
 
 ## 2. Install Dependencies
 You'll need Node.js and npm installed.
@@ -166,17 +167,21 @@ Create a .env file in the project root. This file stores configuration that shou
 
 # Server Configuration
 
+```
 PORT=3000
 HOST=localhost
+```
 
 # Scraping Configuration
 
+```
 USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 
 REQUEST_DELAY_MS=500
 
 # API Limits
 MAX_IMAGE_COUNT=200 (per query)
+```
 
 4. Run the Server
 
